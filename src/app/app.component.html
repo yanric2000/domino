@@ -24,23 +24,41 @@
   <br>
   <br>
 
-  <po-widget
-    [p-height]="150"
-    p-title="Para comprar"
-  >
+  <div class="po-row">
+    <po-widget
+      class="po-md-6"
+      [p-height]="150"
+      p-title="Mesa"
+    >
 
-    <div class="po-row">
-      <ng-container *ngFor="let pedra of pedrasParaCompra">
+      <div class="po-row">
+        <ng-container *ngFor="let pedra of pedrasParaCompra">
 
-        <div class="carta escondido clicavel">
-          {{ pedra.valor1 }} | {{ pedra.valor2 }}
-        </div>
+          <div class="carta escondido clicavel">
+            {{ pedra.valor1 }} | {{ pedra.valor2 }}
+          </div>
 
-      </ng-container>
+        </ng-container>
+      </div>
+    </po-widget>
 
-    </div>
+    <po-widget
+      class="po-md-6"
+      [p-height]="150"
+      p-title="Para comprar"
+    >
+      <div class="po-row">
+        <ng-container *ngFor="let pedra of pedrasParaCompra">
 
-  </po-widget>
+          <div class="carta escondido clicavel">
+            {{ pedra.valor1 }} | {{ pedra.valor2 }}
+          </div>
+
+        </ng-container>
+
+      </div>
+    </po-widget>
+  </div>
 
   <br>
   <br>
@@ -50,20 +68,16 @@
     p-title="Jogador"
     [p-height]="150"
   >
-
     <div class="po-row">
       <ng-container *ngFor="let pedra of jogador.pedras">
 
-        <div class="carta clicavel">
+        <div (click)="jogarPedra(pedra)" class="carta clicavel">
           {{ pedra.valor1 }} | {{ pedra.valor2 }}
         </div>
 
       </ng-container>
     </div>
-
   </po-widget>
-
-  <button (click)="teste()">DEBUG</button>
 
 </po-page-default>
 

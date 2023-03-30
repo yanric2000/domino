@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
+import { Deque } from './deck';
 import { IPedra } from './domino.interface';
 import { IJogador } from './jogador.interface';
 import { pedrasFactory } from './pedras';
@@ -11,6 +12,7 @@ import { pedrasFactory } from './pedras';
 })
 export class AppComponent implements OnInit {
   public pedrasParaCompra: IPedra[] = [];
+  public pedrasMesa = new Deque<IPedra>();
 
   public jogador: IJogador = {
     pedras: [],
@@ -22,8 +24,6 @@ export class AppComponent implements OnInit {
     pontuacao: 0,
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
-
   ngOnInit(): void {
     this.novoJogo();
   }
@@ -33,15 +33,75 @@ export class AppComponent implements OnInit {
     this.jogador.pontuacao = 0;
     this.computador.pontuacao = 0;
 
-    this.distribuirPecasJogador();
-    this.distribuirPecasComputador();
+    this.distribuirPedrasJogador();
+    this.distribuirPedrasComputador();
+    this.jogarMaiorPedraEntreOsJogadores();
   }
 
-  public teste(): void {
-    console.log('');
+  public jogarPedra(pedra: IPedra): void {}
+
+  private jogarMaiorPedraEntreOsJogadores(): void {
+    if (
+      this.obterCondicoesJogadorComeca().some((condicao) => condicao === true)
+    ) {
+      this.jogarMaiorPedraJogador();
+    } else {
+      this.jogarMaiorPedraComputador();
+    }
   }
 
-  private distribuirPecasJogador(): void {
+  private obterCondicoesJogadorComeca() {
+    const duplasJogador = this.encontrarPedrasDuplasOrdenadas(
+      this.jogador.pedras
+    );
+    const duplasComputador = this.encontrarPedrasDuplasOrdenadas(
+      this.computador.pedras
+    );
+    const duplaJogadorMaiorQueComputador =
+      duplasJogador.length > 0 &&
+      duplasComputador.length > 0 &&
+      duplasJogador[0].valor1 > duplasComputador[0].valor1;
+    const jogadorPossuiDuplaEComputadorNao =
+      duplasJogador.length > 0 && duplasComputador.length === 0;
+
+    const condicoesJogadorComeca = [
+      duplaJogadorMaiorQueComputador,
+      jogadorPossuiDuplaEComputadorNao,
+      this.encontrarMaiorValorPedras(this.jogador.pedras) >
+        this.encontrarMaiorValorPedras(this.computador.pedras),
+    ];
+
+    return condicoesJogadorComeca;
+  }
+
+  private jogarMaiorPedraJogador(): void {}
+
+  private jogarMaiorPedraComputador(): void {}
+
+  private encontrarMaiorValorPedras(pedras: IPedra[]): number {
+    let maiorPedra: IPedra = {
+      valor1: 0,
+      valor2: 0,
+    };
+    pedras.forEach((pedra) => {
+      if (pedra.valor1 + pedra.valor2 > maiorPedra.valor1 + maiorPedra.valor2) {
+        maiorPedra = pedra;
+      }
+    });
+
+    return maiorPedra.valor1 + maiorPedra.valor2;
+  }
+
+  private encontrarPedrasDuplasOrdenadas(pedras: IPedra[]): IPedra[] {
+    return pedras
+      .filter((pedra) => pedra.valor1 === pedra.valor2)
+      .sort(
+        (pedra1, pedra2) =>
+          pedra1.valor1 + pedra1.valor2 - (pedra2.valor1 + pedra2.valor2)
+      );
+  }
+
+  private distribuirPedrasJogador(): void {
     this.jogador.pedras = [];
 
     for (let i = 0; i < 7; i++) {
@@ -54,7 +114,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private distribuirPecasComputador(): void {
+  private distribuirPedrasComputador(): void {
     this.computador.pedras = [];
 
     for (let i = 0; i < 7; i++) {
