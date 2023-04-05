@@ -32,9 +32,9 @@
     >
 
       <div class="po-row">
-        <ng-container *ngFor="let pedra of pedrasParaCompra">
+        <ng-container *ngFor="let pedra of pedrasMesa.converterParaLista()">
 
-          <div class="carta escondido clicavel">
+          <div class="carta">
             {{ pedra.valor1 }} | {{ pedra.valor2 }}
           </div>
 
@@ -71,7 +71,7 @@
     <div class="po-row">
       <ng-container *ngFor="let pedra of jogador.pedras">
 
-        <div (click)="jogarPedra(pedra)" class="carta clicavel">
+        <div (click)="jogarPedra(pedra, jogador)" class="carta clicavel">
           {{ pedra.valor1 }} | {{ pedra.valor2 }}
         </div>
 

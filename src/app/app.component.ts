@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Deque } from './deck';
 import { IPedra } from './domino.interface';
 import { IJogador } from './jogador.interface';
 import { pedrasFactory } from './pedras';
@@ -38,7 +37,32 @@ export class AppComponent implements OnInit {
     this.jogarMaiorPedraEntreOsJogadores();
   }
 
-  public jogarPedra(pedra: IPedra): void {}
+  public jogarPedra(
+    pedraJogada: IPedra,
+    jogador: IJogador,
+    jogarInicio = true
+  ): void {
+    const indicePedra = jogador.pedras.findIndex(
+      (pedra) => pedra === pedraJogada
+    );
+    jogador.pedras.splice(indicePedra, 1);
+
+    const mesaVazia = this.pedrasMesa.estaVazio();
+
+    // PRIMEIRA PEDRA
+    if (mesaVazia) {
+      // TODO
+    }
+    // JA EXISTE PEDRA
+    // TODO JOGAR NO COMECO OU NO FIM
+    else if (jogarInicio) {
+      this.jogarPedraInicio(pedraJogada);
+    } else {
+      this.jogarPedraFim(pedraJogada);
+    }
+
+    // this.pedrasMesa.inserirFim(pedraJogada);
+  }
 
   private jogarMaiorPedraEntreOsJogadores(): void {
     if (
@@ -82,6 +106,7 @@ export class AppComponent implements OnInit {
     let maiorPedra: IPedra = {
       valor1: 0,
       valor2: 0,
+      invertido: false,
     };
     pedras.forEach((pedra) => {
       if (pedra.valor1 + pedra.valor2 > maiorPedra.valor1 + maiorPedra.valor2) {
@@ -129,5 +154,58 @@ export class AppComponent implements OnInit {
 
   private obterNumeroAleatorio(minimo: number, maximo: number): number {
     return Math.floor(Math.random() * (maximo - minimo + 1)) + minimo;
+  }
+
+  private jogarPedraInicio(pedraJogada: IPedra): void {
+    const primeiraPedra = this.pedrasMesa.obterInicio();
+
+    if (!primeiraPedra) {
+      return;
+    }
+
+    const valorDisponivelPedraAnterior = primeiraPedra.dados.invertido
+      ? primeiraPedra.dados.valor2
+      : primeiraPedra.dados.valor1;
+    if (pedraJogada.valor1 === valorDisponivelPedraAnterior) {
+      // ADICIONA A PEDRA NORMAL
+      primeiraPedra.proximo = {
+        anterior: primeiraPedra,
+        dados: pedraJogada,
+        proximo: null,
+      };
+    } else if (pedraJogada.valor2 === valorDisponivelPedraAnterior) {
+      // ADICIONA A PEDRA INVERTIDA
+      pedraJogada.invertido = true;
+      primeiraPedra.proximo = {
+        anterior: primeiraPedra,
+        dados: pedraJogada,
+        proximo: null,
+      };
+    }
+  }
+
+  // TODO TERMINAR
+  private jogarPedraFim(pedraJogada: IPedra): void {
+    // const primeiraPedra = this.pedrasMesa.obterInicio();
+    // if(!primeiraPedra) {
+    //   return;
+    // }
+    // const valorDisponivelPedraAnterior = primeiraPedra.dados.invertido ? primeiraPedra.dados.valor2 : primeiraPedra.dados.valor1;
+    //   if(pedraJogada.valor1 === valorDisponivelPedraAnterior) {
+    //     // ADICIONA A PEDRA NORMAL
+    //     primeiraPedra.proximo = {
+    //       anterior: primeiraPedra,
+    //       dados: pedraJogada,
+    //       proximo: null
+    //     };
+    //   } else if(pedraJogada.valor2 === valorDisponivelPedraAnterior){
+    //       // ADICIONA A PEDRA INVERTIDA
+    //       pedraJogada.invertido = true;
+    //       primeiraPedra.proximo = {
+    //         anterior: primeiraPedra,
+    //         dados: pedraJogada,
+    //         proximo: null
+    //       };
+    //   }
   }
 }
