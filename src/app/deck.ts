@@ -53,7 +53,7 @@
 //     this.next = next;
 //   }
 // }
-class NoDeque<T> {
+export class NoDeque<T> {
   dados: T;
   anterior: NoDeque<T> | null;
   proximo: NoDeque<T> | null;
@@ -69,9 +69,9 @@ class NoDeque<T> {
   }
 }
 
-class Deque<T> {
-  private cabeca: NoDeque<T> | null = null;
-  private cauda: NoDeque<T> | null = null;
+export class Deque<T> {
+  public cabeca: NoDeque<T> | null = null;
+  public cauda: NoDeque<T> | null = null;
   private tamanho = 0;
 
   inserirInicio(item: T) {

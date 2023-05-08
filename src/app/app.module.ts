@@ -11,9 +11,10 @@ import {
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { PedraComponent } from './src/pedra/pedra.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, PedraComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

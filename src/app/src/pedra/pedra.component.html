@@ -1,0 +1,10 @@
+<div
+  [ngClass]="{
+    'escondida': escondida,
+    'clicavel': clicavel
+  }"
+  class="carta"
+  (click)="jogarPedra()"
+>
+  {{ conteudoParaMostrar }}
+</div>

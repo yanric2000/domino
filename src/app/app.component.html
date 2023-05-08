@@ -10,9 +10,11 @@
     <div class="po-row">
       <ng-container *ngFor="let pedra of computador.pedras">
 
-        <div class="carta">
-          {{ pedra.valor1 }} | {{ pedra.valor2 }}
-        </div>
+        <app-pedra
+          [pedra]="pedra"
+          [clicavel]="false"
+          [escondida]="false"
+        ></app-pedra>
 
       </ng-container>
 
@@ -27,32 +29,32 @@
   <div class="po-row">
     <po-widget
       class="po-md-6"
-      [p-height]="150"
+      [p-height]="220"
       p-title="Mesa"
     >
-
       <div class="po-row">
-        <ng-container *ngFor="let pedra of pedrasMesa.converterParaLista()">
 
-          <div class="carta">
-            {{ pedra.valor1 }} | {{ pedra.valor2 }}
-          </div>
-
+        <ng-container *ngFor="let pedra of pedrasMesa.pedras">
+          <app-pedra [pedra]="pedra"></app-pedra>
         </ng-container>
+
       </div>
     </po-widget>
 
     <po-widget
       class="po-md-6"
-      [p-height]="150"
+      [p-height]="220"
       p-title="Para comprar"
     >
       <div class="po-row">
         <ng-container *ngFor="let pedra of pedrasParaCompra">
 
-          <div class="carta escondido clicavel">
-            {{ pedra.valor1 }} | {{ pedra.valor2 }}
-          </div>
+          <app-pedra
+            [pedra]="pedra"
+            [escondida]="true"
+            [clicavel]="true"
+            (jogar)="comprarPedra(jogador, pedra)"
+          ></app-pedra>
 
         </ng-container>
 
@@ -71,13 +73,14 @@
     <div class="po-row">
       <ng-container *ngFor="let pedra of jogador.pedras">
 
-        <div (click)="jogarPedra(pedra, jogador)" class="carta clicavel">
-          {{ pedra.valor1 }} | {{ pedra.valor2 }}
-        </div>
+        <app-pedra
+          [pedra]="pedra"
+          [clicavel]="true"
+          (jogar)="jogarPedra(pedra, jogador)"
+        ></app-pedra>
 
       </ng-container>
     </div>
   </po-widget>
 
 </po-page-default>
-
