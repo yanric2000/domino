@@ -1,0 +1,13 @@
+.centralizar {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.container-pedras-mesa {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  overflow-y: visible;
+  width: 500px;
+}

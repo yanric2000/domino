@@ -34,18 +34,18 @@ export class Mesa {
   }
 
   public inserirFim(pedra: IPedra): void {
-    const pedraInicio = this.pedras[0];
+    const pedraFim = this.obterFim();
 
-    if (this.pedras.length === 0) {
+    if (this.pedras.length === 0 || !pedraFim) {
       this.pedras.push(pedra);
 
       return;
     }
 
     const valor2 = pedra.valor2;
-    const valorDisponivel = pedraInicio.invertido
-      ? pedraInicio.valor1
-      : pedraInicio.valor2;
+    const valorDisponivel = pedraFim.invertido
+      ? pedraFim.valor1
+      : pedraFim.valor2;
 
     if (valorDisponivel === valor2) {
       pedra.invertido = true;

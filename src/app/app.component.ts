@@ -15,26 +15,33 @@ export class AppComponent implements OnInit {
   public pedrasMesa = new Mesa();
 
   public jogador: IJogador = {
+    nome: '',
     pedras: [],
     pontuacao: 0,
   };
 
   public computador: IJogador = {
+    nome: 'Computador',
     pedras: [],
     pontuacao: 0,
   };
 
   ngOnInit(): void {
+    const nome = prompt('Qual seu nome?') as string;
+    this.jogador.nome = nome;
     this.novoJogo();
   }
 
   public novoJogo(): void {
+    this.pedrasMesa = new Mesa();
     this.pedrasParaCompra = pedrasFactory();
     this.jogador.pontuacao = 0;
+    this.jogador.pedras = [];
     this.computador.pontuacao = 0;
+    this.computador.pedras = [];
 
-    this.distribuirPedrasJogador();
-    this.distribuirPedrasComputador();
+    this.distribuirPedrasJogador(this.jogador);
+    this.distribuirPedrasJogador(this.computador);
     this.jogarMaiorPedraEntreOsJogadores();
   }
 
@@ -52,6 +59,13 @@ export class AppComponent implements OnInit {
       pedraJogada,
       jogador
     );
+
+    // Se o jogador não tem pedras ele ganhou
+    if (jogador.pedras.length === 0) {
+      alert(`O jogador ${jogador.nome} ganhou. Iniciando um novo jogo`);
+      this.novoJogo();
+      return;
+    }
 
     // Caso o jogador tenha feito o lance é a vez do computador
     if (jogador !== this.computador && cartaFoiJogada) {
@@ -229,8 +243,8 @@ export class AppComponent implements OnInit {
       .sort(this.ordenarPedrasPelaSomaValores());
   }
 
-  private distribuirPedrasJogador(): void {
-    this.jogador.pedras = [];
+  private distribuirPedrasJogador(jogador: IJogador): void {
+    jogador.pedras = [];
 
     for (let i = 0; i < 7; i++) {
       const pedraAleatoria = this.pedrasParaCompra.splice(
@@ -238,22 +252,22 @@ export class AppComponent implements OnInit {
         1
       );
 
-      this.jogador.pedras.push(pedraAleatoria[0]);
+      jogador.pedras.push(pedraAleatoria[0]);
     }
   }
 
-  private distribuirPedrasComputador(): void {
-    this.computador.pedras = [];
+  // private distribuirPedrasComputador(): void {
+  //   this.computador.pedras = [];
 
-    for (let i = 0; i < 7; i++) {
-      const pedraAleatoria = this.pedrasParaCompra.splice(
-        this.obterNumeroAleatorio(0, this.pedrasParaCompra.length - 1),
-        1
-      );
+  //   for (let i = 0; i < 7; i++) {
+  //     const pedraAleatoria = this.pedrasParaCompra.splice(
+  //       this.obterNumeroAleatorio(0, this.pedrasParaCompra.length - 1),
+  //       1
+  //     );
 
-      this.computador.pedras.push(pedraAleatoria[0]);
-    }
-  }
+  //     this.computador.pedras.push(pedraAleatoria[0]);
+  //   }
+  // }
 
   private obterNumeroAleatorio(minimo: number, maximo: number): number {
     return Math.floor(Math.random() * (maximo - minimo + 1)) + minimo;
@@ -311,7 +325,8 @@ export class AppComponent implements OnInit {
 
       // Não existe nenhuma carta que pode ser jogada
       if (quantidadeCartasParaComprar === 0) {
-        this.desistir(this.computador);
+        // Passar a vez para o usuário
+        this.passarVezProximoJogador(this.computador);
         return;
       }
 
@@ -399,11 +414,18 @@ export class AppComponent implements OnInit {
     const quantidadePedrasDisponiveisParaJogar =
       this.encontrarPedrasDisponiveisParaJogar(jogador);
     const naoExistemMaisPedrasParaComprar = this.pedrasParaCompra.length === 0;
-    const jogadorPossuiPedraParaJogar =
+    const jogadorNaoPossuiPedraParaJogar =
       quantidadePedrasDisponiveisParaJogar.length === 0;
 
-    if (naoExistemMaisPedrasParaComprar && jogadorPossuiPedraParaJogar) {
-      this.desistir(jogador);
+    // Se não existir carta para jogar precisa passar a vez
+    if (naoExistemMaisPedrasParaComprar && jogadorNaoPossuiPedraParaJogar) {
+      this.passarVezProximoJogador(jogador);
+    }
+  }
+
+  private passarVezProximoJogador(jogador: IJogador): void {
+    if (jogador === this.jogador) {
+      this.jogarPedraDoComputador();
     }
   }
 }

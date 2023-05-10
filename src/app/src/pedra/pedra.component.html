@@ -1,10 +1,41 @@
 <div
   [ngClass]="{
     'escondida': escondida,
-    'clicavel': clicavel
+    'clicavel': clicavel,
+    'vertical': pedraNaVertical
   }"
   class="carta"
   (click)="jogarPedra()"
 >
-  {{ conteudoParaMostrar }}
+  <ng-container
+    *ngTemplateOutlet="escondida ? esconderTemplate : mostrarTemplate"
+  ></ng-container>
+
 </div>
+
+<ng-template #mostrarTemplate>
+  <ng-container
+    *ngTemplateOutlet="pedraNaVertical ? verticalTemplate : horizontalTemplate"
+  ></ng-container>
+</ng-template>
+
+<ng-template #esconderTemplate>
+  <p> ? </p>
+</ng-template>
+
+<ng-template #verticalTemplate>
+  <p>
+    {{ primeiroValor }}
+    <br>
+    <span [ngClass]="{'barra-vertical': pedraNaVertical}"> | </span>
+    <br>
+    {{ segundoValor }}
+  </p>
+</ng-template>
+
+<ng-template #horizontalTemplate>
+  <p>
+    {{ primeiroValor }} | {{ segundoValor }}
+  </p>
+</ng-template>
+

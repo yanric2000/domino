@@ -3,7 +3,7 @@
 >
 
   <po-widget
-    [p-height]="150"
+    [p-height]="200"
     p-title="Computador"
   >
 
@@ -13,7 +13,7 @@
         <app-pedra
           [pedra]="pedra"
           [clicavel]="false"
-          [escondida]="false"
+          [escondida]="true"
         ></app-pedra>
 
       </ng-container>
@@ -32,10 +32,10 @@
       [p-height]="220"
       p-title="Mesa"
     >
-      <div class="po-row">
+      <div class="container-pedras-mesa">
 
         <ng-container *ngFor="let pedra of pedrasMesa.pedras">
-          <app-pedra [pedra]="pedra"></app-pedra>
+          <app-pedra class="centralizar" [pedra]="pedra"></app-pedra>
         </ng-container>
 
       </div>
@@ -68,7 +68,7 @@
 
   <po-widget
     p-title="Jogador"
-    [p-height]="150"
+    [p-height]="200"
   >
     <div class="po-row">
       <ng-container *ngFor="let pedra of jogador.pedras">

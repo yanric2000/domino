@@ -15,11 +15,13 @@ export class PedraComponent implements OnInit {
   @Output() jogar = new EventEmitter<IPedra>();
 
   public conteudoParaMostrar: string = '?';
+  public pedraNaVertical = false;
+  public primeiroValor: number = 0;
+  public segundoValor: number = 0;
 
   ngOnInit(): void {
-    if (!this.escondida) {
-      this.conteudoParaMostrar = this.concatenarConteudoCarta();
-    }
+    this.pedraNaVertical = this.pedra.valor1 === this.pedra.valor2;
+    this.atribuirValoresPedra();
   }
 
   public jogarPedra(): void {
@@ -30,10 +32,13 @@ export class PedraComponent implements OnInit {
     this.jogar.emit(this.pedra);
   }
 
-  private concatenarConteudoCarta(): string {
+  private atribuirValoresPedra(): void {
     if (this.pedra.invertido) {
-      return `${this.pedra.valor2} | ${this.pedra.valor1}`;
+      this.primeiroValor = this.pedra.valor2;
+      this.segundoValor = this.pedra.valor1;
+    } else {
+      this.primeiroValor = this.pedra.valor1;
+      this.segundoValor = this.pedra.valor2;
     }
-    return `${this.pedra.valor1} | ${this.pedra.valor2}`;
   }
 }
