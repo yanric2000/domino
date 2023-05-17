@@ -26,6 +26,8 @@ export class AppComponent implements OnInit {
     pontuacao: 0,
   };
 
+  private readonly quantidadePedrasMesmoNumero = 7;
+
   ngOnInit(): void {
     const nome = prompt('Qual seu nome?') as string;
     this.jogador.nome = nome;
@@ -256,19 +258,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // private distribuirPedrasComputador(): void {
-  //   this.computador.pedras = [];
-
-  //   for (let i = 0; i < 7; i++) {
-  //     const pedraAleatoria = this.pedrasParaCompra.splice(
-  //       this.obterNumeroAleatorio(0, this.pedrasParaCompra.length - 1),
-  //       1
-  //     );
-
-  //     this.computador.pedras.push(pedraAleatoria[0]);
-  //   }
-  // }
-
   private obterNumeroAleatorio(minimo: number, maximo: number): number {
     return Math.floor(Math.random() * (maximo - minimo + 1)) + minimo;
   }
@@ -310,7 +299,7 @@ export class AppComponent implements OnInit {
 
   private ordenarPedrasPelaSomaValores() {
     return (pedra1: IPedra, pedra2: IPedra) =>
-      pedra1.valor1 + pedra1.valor2 - (pedra2.valor1 + pedra2.valor2);
+      pedra2.valor1 + pedra2.valor2 - (pedra1.valor1 + pedra1.valor2);
   }
 
   private jogarPedraDoComputador(): void {
@@ -318,6 +307,7 @@ export class AppComponent implements OnInit {
     let pedrasParaJogar = this.encontrarPedrasDisponiveisParaJogar(
       this.computador
     );
+    let pedraParaJogar: IPedra;
 
     // Compra uma carta sendo possível de jogar
     while (pedrasParaJogar.length === 0) {
@@ -345,12 +335,78 @@ export class AppComponent implements OnInit {
       );
     }
 
-    pedrasParaJogar.sort(
-      (pedra1, pedra2) =>
-        pedra2.valor1 + pedra2.valor2 - pedra1.valor1 + pedra1.valor2
+    pedrasParaJogar.sort(this.ordenarPedrasPelaSomaValores());
+
+    pedraParaJogar = pedrasParaJogar[0];
+
+    // Se existir mais de 1 possível pedra é preciso validar se alguma delas trava a ponta
+    if (pedrasParaJogar.length > 1) {
+      const pedrasQueNaoSeguramPonta =
+        this.encontrarPedrasQueNaoSeguramPonta(pedrasParaJogar);
+      const existemPedrasQueNaoSeguramPonta =
+        pedrasQueNaoSeguramPonta.length > 0;
+
+      if (existemPedrasQueNaoSeguramPonta) {
+        pedraParaJogar = pedrasQueNaoSeguramPonta[0];
+      }
+    }
+
+    this.jogarPedra(pedraParaJogar, this.computador);
+  }
+
+  private encontrarPedrasQueNaoSeguramPonta(
+    pedrasParaJogar: IPedra[]
+  ): IPedra[] {
+    const pedrasQueNaoSeguramPonta: IPedra[] = [];
+
+    pedrasParaJogar.forEach((pedra) => {
+      const pedraPodeSerJogadaNoInicio = this.verificarPedraPodeSerJogada(
+        pedra,
+        'I'
+      );
+      const pedraPodeSerJogadaNoFim = this.verificarPedraPodeSerJogada(
+        pedra,
+        'F'
+      );
+
+      if (pedraPodeSerJogadaNoInicio) {
+        const valorInicio = this.pedrasMesa.obterValorInicioDisponivel();
+        const quantidadePedrasMesmoNumeroJogadas =
+          this.pedrasMesa.obterQuantidadeDeNumerosJogados(valorInicio);
+        const quantidadePedrasNaMaoComValor = this.computador.pedras.filter(
+          (pedra) =>
+            pedra.valor1 === valorInicio || pedra.valor2 === valorInicio
+        ).length;
+
+        if (
+          quantidadePedrasMesmoNumeroJogadas + quantidadePedrasNaMaoComValor !==
+          this.quantidadePedrasMesmoNumero
+        ) {
+          pedrasQueNaoSeguramPonta.push(pedra);
+        }
+      }
+      if (pedraPodeSerJogadaNoFim) {
+        const valorFim = this.pedrasMesa.obterValorFimDisponivel();
+        const quantidadePedrasMesmoNumeroJogadas =
+          this.pedrasMesa.obterQuantidadeDeNumerosJogados(valorFim);
+        const quantidadePedrasNaMaoComValor = this.computador.pedras.filter(
+          (pedra) => pedra.valor1 === valorFim || pedra.valor2 === valorFim
+        ).length;
+
+        if (
+          quantidadePedrasMesmoNumeroJogadas + quantidadePedrasNaMaoComValor !==
+          this.quantidadePedrasMesmoNumero
+        ) {
+          pedrasQueNaoSeguramPonta.push(pedra);
+        }
+      }
+    });
+
+    const retorno = pedrasParaJogar.filter((pedra) =>
+      pedrasQueNaoSeguramPonta.includes(pedra)
     );
 
-    this.jogarPedra(pedrasParaJogar[0], this.computador);
+    return retorno;
   }
 
   private encontrarPedrasDisponiveisParaJogar(jogador: IJogador): IPedra[] {
@@ -368,16 +424,6 @@ export class AppComponent implements OnInit {
     return pedrasDisponiveis;
   }
 
-  private desistir(jogador: IJogador): void {
-    if (jogador === this.jogador) {
-      alert('Você perdeu');
-    } else if (jogador === this.computador) {
-      alert('Parabéns você ganhou');
-    }
-
-    this.novoJogo();
-  }
-
   private jogarPedraComputadorNoMelhorLado(pedra: IPedra): void {
     // Verifica qual dos valores se repetiu mais vezes na mesa para então jogar no lado oposto
     const valorInicio = this.obterValorPedraDisponivel('I');
@@ -387,19 +433,6 @@ export class AppComponent implements OnInit {
       this.pedrasMesa.obterQuantidadeDeNumerosJogados(valorInicio);
     const quantidadePedrasJogadasIguaisFim =
       this.pedrasMesa.obterQuantidadeDeNumerosJogados(valorFim);
-
-    console.log(
-      'valor inicio -> ',
-      valorInicio,
-      '. Qtd na mesa: ',
-      quantidadePedrasJogadasIguaisInicio
-    );
-    console.log(
-      'valor inicio -> ',
-      valorFim,
-      '. Qtd na mesa: ',
-      quantidadePedrasJogadasIguaisFim
-    );
 
     if (
       quantidadePedrasJogadasIguaisInicio > quantidadePedrasJogadasIguaisFim

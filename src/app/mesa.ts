@@ -12,7 +12,7 @@ export class Mesa {
   }
 
   public inserirInicio(pedra: IPedra): void {
-    const pedraInicio = this.pedras[0];
+    const pedraInicio = this.obterInicio() as IPedra;
 
     if (this.pedras.length === 0) {
       this.pedras.push(pedra);
@@ -66,5 +66,16 @@ export class Mesa {
     return this.pedras.filter(
       (pedra) => pedra.valor1 === numero || pedra.valor2 === numero
     ).length;
+  }
+
+  public obterValorInicioDisponivel(): number {
+    const pedraInicio = this.obterInicio() as IPedra;
+
+    return pedraInicio.invertido ? pedraInicio.valor2 : pedraInicio.valor1;
+  }
+
+  public obterValorFimDisponivel(): number {
+    const pedraFim = this.obterFim() as IPedra;
+    return pedraFim.invertido ? pedraFim.valor1 : pedraFim.valor2;
   }
 }
